@@ -2,23 +2,25 @@ import os
 from pathlib import Path
 import dj_database_url
 
-# ================================
+# ==================================================
 # BASE
-# ================================
+# ==================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ================================
-# CONFIGURAÇÕES BÁSICAS
-# ================================
-SECRET_KEY = os.environ.get('SECRET_KEY', 'sua_chave_secreta_aqui')
+
+# ==================================================
+# SEGURANÇA
+# ==================================================
+SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['.onrender.com']
+ALLOWED_HOSTS = ['.onrender.com', '127.0.0.1', 'localhost']
 
-# ================================
-# APPS INSTALADOS
-# ================================
+
+# ==================================================
+# APPS
+# ==================================================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,13 +33,14 @@ INSTALLED_APPS = [
     'widget_tweaks',
 ]
 
-# ================================
+
+# ==================================================
 # MIDDLEWARE
-# ================================
+# ==================================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # WhiteNoise (IMPORTANTE para Render)
+    # WhiteNoise para servir arquivos estáticos na Render
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -48,11 +51,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'setup.urls'
 
-# ================================
+# ==================================================
+# URLS / WSGI
+# ==================================================
+ROOT_URLCONF = 'setup.urls'
+WSGI_APPLICATION = 'setup.wsgi.application'
+
+
+# ==================================================
 # TEMPLATES
-# ================================
+# ==================================================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -69,68 +78,89 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'setup.wsgi.application'
 
-# ================================
-# BANCO DE DADOS (Render Ready)
-# ================================
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-    )
-}
+# ==================================================
+# BANCO DE DADOS
+# ==================================================
+# ==================================================
+# BANCO DE DADOS
+# ==================================================
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-# ================================
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+
+
+# ==================================================
 # VALIDAÇÃO DE SENHA
-# ================================
+# ==================================================
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ================================
-# LOCALIZAÇÃO
-# ================================
+
+# ==================================================
+# INTERNACIONALIZAÇÃO
+# ==================================================
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 USE_TZ = True
 
-# ================================
+
+# ==================================================
 # ARQUIVOS ESTÁTICOS
-# ================================
+# ==================================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ================================
-# LOGIN
-# ================================
+
+# ==================================================
+# LOGIN / AUTH
+# ==================================================
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# ================================
+
+# ==================================================
 # MEDIA
-# ================================
+# ==================================================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# ================================
+
+# ==================================================
 # SEGURANÇA PRODUÇÃO
-# ================================
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+# ==================================================
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
