@@ -1,43 +1,20 @@
-LANGUAGE_CODE = 'pt-br'
-
-TIME_ZONE = 'America/Sao_Paulo'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-
-
-
 import os
 from pathlib import Path
+import dj_database_url
 
-# BASE_DIR aponta para a raiz do projeto (C:\twtodos)
+# ================================
+# BASE
+# ================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ================================
 # CONFIGURAÇÕES BÁSICAS
 # ================================
-SECRET_KEY = 'sua_chave_secreta_aqui'
-DEBUG = False
+SECRET_KEY = os.environ.get('SECRET_KEY', 'sua_chave_secreta_aqui')
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-    },
-}
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['.onrender.com']
-
 
 # ================================
 # APPS INSTALADOS
@@ -49,8 +26,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'todos',  # seu app de tarefas
-     "widget_tweaks",
+
+    'todos',
+    'widget_tweaks',
 ]
 
 # ================================
@@ -58,6 +36,10 @@ INSTALLED_APPS = [
 # ================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+
+    # WhiteNoise (IMPORTANTE para Render)
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,14 +53,10 @@ ROOT_URLCONF = 'setup.urls'
 # ================================
 # TEMPLATES
 # ================================
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # 👈 isso é OBRIGATÓRIO
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,19 +69,16 @@ TEMPLATES = [
     },
 ]
 
-
-
-
 WSGI_APPLICATION = 'setup.wsgi.application'
 
 # ================================
-# BANCO DE DADOS (SQLite)
+# BANCO DE DADOS (Render Ready)
 # ================================
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 # ================================
@@ -129,38 +104,33 @@ AUTH_PASSWORD_VALIDATORS = [
 # ================================
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
+
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 # ================================
 # ARQUIVOS ESTÁTICOS
 # ================================
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'    # pasta para coletar arquivos com collectstatic
-import os
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ================================
 # LOGIN
-# settings.py
-
+# ================================
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-
-
-
-
-
-
-
 # ================================
-# MEDIA (se usar uploads)
+# MEDIA
 # ================================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ================================
+# SEGURANÇA PRODUÇÃO
+# ================================
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
