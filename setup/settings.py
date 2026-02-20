@@ -36,7 +36,7 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = ['.railway.app']
+ALLOWED_HOSTS = ['.onrender.com']
 
 
 # ================================
