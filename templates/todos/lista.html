@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Tarefas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'todos/style.css' %}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="top-bar" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Olá, {{ request.user.username }} 👋</span>
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" 
+                    style="padding:8px 14px; border:none; border-radius:6px; 
+                           background:#e74c3c; color:white; cursor:pointer;">
+                Sair
+            </button>
+        </form>
+    </div>
+
+    <h1 style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Minhas Tarefas</span>
+        <a href="{% url 'todos:create' %}" 
+           style="padding:10px 16px; background:#2ecc71; color:white; 
+                  text-decoration:none; border-radius:6px;">
+            + Nova tarefa
+        </a>
+    </h1>
+
+    {% if todos %}
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#f4f4f4;">
+                        <th style="width:15%; padding:10px;">Título</th>
+                        <th style="width:40%; padding:10px;">Descrição</th>
+                        <th style="width:10%; padding:10px;">Data</th>
+                        <th style="width:10%; padding:10px;">Status</th>
+                        <th style="width:25%; padding:10px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for todo in todos %}
+                        <tr style="border-bottom:1px solid #ddd;">
+                            <td style="padding:10px;">
+                                <strong>{{ todo.title }}</strong>
+                            </td>
+
+                            <td style="padding:10px; word-break:break-word;">
+                                {{ todo.description|default:"-" }}
+                            </td>
+
+                            <td style="padding:10px;">
+                                {{ todo.created_at|date:"d/m/Y" }}
+                            </td>
+
+                            <td style="padding:10px;">
+                                {% if todo.completed %}
+                                    <span style="color:#27ae60; font-weight:bold;">
+                                        Concluída
+                                    </span>
+                                {% else %}
+                                    <span style="color:#e67e22; font-weight:bold;">
+                                        Pendente
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td style="padding:10px;">
+                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+
+                                    {% if not todo.completed %}
+                                        <a href="{% url 'todos:edit' todo.id %}"
+                                           style="padding:6px 10px; background:#3498db; 
+                                                  color:white; text-decoration:none; 
+                                                  border-radius:4px;">
+                                            Editar
+                                        </a>
+
+                                        <a href="{% url 'todos:complete' todo.id %}"
+                                           style="padding:6px 10px; background:#2ecc71; 
+                                                  color:white; text-decoration:none; 
+                                                  border-radius:4px;">
+                                            Concluir
+                                        </a>
+                                    {% endif %}
+
+                                    <a href="{% url 'todos:delete' todo.id %}"
+                                       onclick="return confirm('Deseja excluir esta tarefa?')"
+                                       style="padding:6px 10px; background:#e74c3c; 
+                                              color:white; text-decoration:none; 
+                                              border-radius:4px;">
+                                        Excluir
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="margin-top:40px; text-align:center;">
+            <p style="font-size:18px;">Nenhuma

@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Tarefas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial; background:#f5f6fa; margin:0; padding:30px;">
+
+<div style="max-width:1200px; margin:auto; background:white; padding:30px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.08);">
+
+    <!-- TOPO -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h2 style="margin:0;">Olá, {{ request.user.username }} 👋</h2>
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit"
+                style="padding:10px 18px; border:none; background:#e74c3c; color:white;
+                       border-radius:6px; cursor:pointer;">
+                Sair
+            </button>
+        </form>
+    </div>
+
+    <!-- TÍTULO -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="margin:0;">Minhas Tarefas</h1>
+
+        <a href="{% url 'todos:create' %}"
+           style="padding:10px 18px; background:#2ecc71; color:white;
+                  text-decoration:none; border-radius:6px;">
+            + Nova tarefa
+        </a>
+    </div>
+
+    {% if todos %}
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; min-width:900px;">
+                <thead>
+                    <tr style="background:#ecf0f1;">
+                        <th style="padding:12px; text-align:left;">Título</th>
+                        <th style="padding:12px; text-align:left;">Descrição</th>
+                        <th style="padding:12px;">Data</th>
+                        <th style="padding:12px;">Status</th>
+                        <th style="padding:12px;">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for todo in todos %}
+                    <tr style="border-bottom:1px solid #ddd;">
+                        <td style="padding:12px; width:15%;">
+                            <strong>{{ todo.title }}</strong>
+                        </td>
+
+                        <!-- MAIS ESPAÇO AQUI -->
+                        <td style="padding:12px; width:45%; word-break:break-word;">
+                            {{ todo.description|default:"-" }}
+                        </td>
+
+                        <td style="padding:12px; text-align:center; width:10%;">
+                            {{ todo.created_at|date:"d/m/Y" }}
+                        </td>
+
+                        <td style="padding:12px; text-align:center; width:10%;">
+                            {% if todo.completed %}
+                                <span style="color:#27ae60; font-weight:bold;">
+                                    Concluída
+                                </span>
+                            {% else %}
+                                <span style="color:#e67e22; font-weight:bold;">
+                                    Pendente
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td style="padding:12px; width:20%;">
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+
+                                {% if not todo.completed %}
+                                    <a href="{% url 'todos:edit' todo.id %}"
+                                       style="padding:6px 12px; background:#3498db;
+                                              color:white; text-decoration:none;
+                                              border-radius:4px; white-space:nowrap;">
+                                        Editar
+                                    </a>
+
+                                    <a href="{% url 'todos:complete' todo.id %}"
+                                       style="padding:6px 12px; background:#2ecc71;
+                                              color:white; text-decoration:none;
+                                              border-radius:4px; white-space:nowrap;">
+                                        Concluir
+                                    </a>
+                                {% endif %}
+
+                                <a href="{% url 'todos:delete' todo.id %}"
+                                   onclick="return confirm('Deseja excluir esta tarefa?')"
+                                   style="padding:6px 12px; background:#e74c3c;
+                                          color:white; text-decoration:none;
+                                          border-radius:4px; white-space:nowrap;">
+                                    Excluir
+                                </a>
+
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align:center; padding:50px;">
+            <h3>Nenhuma tarefa cadastrada 😴</h3>
+            <br>
+            <a href="{% url 'todos:create' %}"
+               style="padding:12px 20px; background:#2ecc71; color:white;
+                      text-decoration:none; border-radius:6px;">
+                Criar primeira tarefa
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
