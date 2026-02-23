@@ -15,7 +15,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['inspire-mois.onrender.com']
+ALLOWED_HOSTS = ['inspire-mof5.onrender.com']
 
 
 # ==================================================
@@ -156,7 +156,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-    CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+    CSRF_TRUSTED_ORIGINS = ["https://*.onrender.com"]
 
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
