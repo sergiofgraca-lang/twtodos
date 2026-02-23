@@ -15,7 +15,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['inspire-mof5.onrender.com']
+ALLOWED_HOSTS = ['inspire-moto.onrender.com']
 
 
 # ==================================================
