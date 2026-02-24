@@ -5,7 +5,7 @@ from todos import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', views.todo_list, name='todos:list'),
+    path('', views.todo_list, name='list'),
     path('create/', views.todo_create, name='create'),
     path('delete/<int:id>/', views.todo_delete, name='delete'),
     path('edit/<int:id>/', views.todo_edit, name='edit'),
