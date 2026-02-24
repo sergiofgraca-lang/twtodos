@@ -5,20 +5,27 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 🔥 FORÇA O CAMINHO DO .env
-env = Config(RepositoryEnv(BASE_DIR / ".env"))
-
 # ==============================
-# SEGURANÇA
+# .env (somente para ambiente local)
 # ==============================
 
-SECRET_KEY = env('SECRET_KEY')
-DEBUG = env('DEBUG', default=False, cast=bool)
+env_path = BASE_DIR / ".env"
+if env_path.exists():
+    env = Config(RepositoryEnv(env_path))
+    SECRET_KEY = env('SECRET_KEY')
+    DEBUG = env('DEBUG', default=False, cast=bool)
+else:
+    SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret-key")
+    DEBUG = False
 
-ALLOWED_HOSTS = env(
-    'ALLOWED_HOSTS',
-    default='127.0.0.1,localhost'
-).split(',')
+# ==============================
+# ALLOWED HOSTS
+# ==============================
+
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS",
+    "127.0.0.1,localhost,inspire-mof5.onrender.com"
+).split(",")
 
 # ==============================
 # APLICAÇÕES
@@ -32,11 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'todos',  # seu app
+    'todos',
 ]
+
+# ==============================
+# MIDDLEWARE
+# ==============================
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # importante no Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -66,14 +78,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'setup.wsgi.application'
 
 # ==============================
-# BANCO DE DADOS (POSTGRESQL)
+# BANCO DE DADOS (Render PostgreSQL)
 # ==============================
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get("DATABASE_URL")
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
     )
 }
+
 # ==============================
 # VALIDAÇÃO DE SENHA
 # ==============================
@@ -98,9 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ==============================
 
 LANGUAGE_CODE = 'pt-br'
-
 TIME_ZONE = 'America/Sao_Paulo'
-
 USE_I18N = True
 USE_TZ = True
 
@@ -108,7 +119,9 @@ USE_TZ = True
 # ARQUIVOS ESTÁTICOS
 # ==============================
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
