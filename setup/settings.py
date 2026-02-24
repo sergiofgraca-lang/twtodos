@@ -17,6 +17,8 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ['*']
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 # ==================================================
 # APPS
@@ -39,8 +41,6 @@ INSTALLED_APPS = [
 # ==================================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
-    # WhiteNoise para servir arquivos estáticos na Render
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -82,17 +82,13 @@ TEMPLATES = [
 # ==================================================
 # BANCO DE DADOS
 # ==================================================
-# ==================================================
-# BANCO DE DADOS
-# ==================================================
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True
+            conn_max_age=600
         )
     }
 else:
@@ -102,7 +98,6 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
 
 
 # ==================================================
@@ -160,7 +155,3 @@ if not DEBUG:
 
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
