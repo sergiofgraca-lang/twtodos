@@ -25,10 +25,12 @@ def logout_view(request):
     return redirect("login")
 
 
+
 @login_required
 def todo_list(request):
-    todos = Todo.objects.all().order_by("-created_at")
+    todos = Todo.objects.filter(user=request.user).order_by("-created_at")
     return render(request, "todos/todo_list.html", {"todos": todos})
+
 
 
 @login_required
@@ -36,7 +38,9 @@ def todo_create(request):
     if request.method == "POST":
         form = TodoForm(request.POST)
         if form.is_valid():
-            form.save()  # salva apenas uma vez
+            todo = form.save(commit=False)
+            todo.user = request.user   # 🔥 AQUI ESTÁ O SEGREDO
+            todo.save()
             return redirect("todos:list")
     else:
         form = TodoForm()
