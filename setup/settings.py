@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'widget_tweaks',
 
     "todos",
 ]
@@ -90,10 +91,14 @@ WSGI_APPLICATION = "setup.wsgi.application"
 # DATABASE (Render PostgreSQL)
 # ==============================
 
+import dj_database_url
+import os
+
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL")
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
     )
+
 }
 
 # ==============================

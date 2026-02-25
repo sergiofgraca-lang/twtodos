@@ -12,7 +12,7 @@ def login_view(request):
 
     form = AuthenticationForm(request, data=request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
+    if form.is_valid():
         user = form.get_user()
         login(request, user)
         return redirect("todos:list")
@@ -25,54 +25,47 @@ def logout_view(request):
     return redirect("login")
 
 
-
 @login_required
 def todo_list(request):
     todos = Todo.objects.filter(user=request.user).order_by("-created_at")
     return render(request, "todos/todo_list.html", {"todos": todos})
 
 
-
 @login_required
 def todo_create(request):
-    if request.method == "POST":
-        form = TodoForm(request.POST)
-        if form.is_valid():
-            todo = form.save(commit=False)
-            todo.user = request.user   # 🔥 AQUI ESTÁ O SEGREDO
-            todo.save()
-            return redirect("todos:list")
-    else:
-        form = TodoForm()
+    form = TodoForm(request.POST or None)
+
+    if form.is_valid():
+        todo = form.save(commit=False)
+        todo.user = request.user
+        todo.save()
+        return redirect("todos:list")
 
     return render(request, "todos/todo_form.html", {"form": form})
 
 
 @login_required
 def todo_delete(request, id):
-    todo = get_object_or_404(Todo, id=id)
+    todo = get_object_or_404(Todo, id=id, user=request.user)
     todo.delete()
     return redirect("todos:list")
 
 
 @login_required
 def todo_edit(request, id):
-    todo = get_object_or_404(Todo, id=id)
+    todo = get_object_or_404(Todo, id=id, user=request.user)
+    form = TodoForm(request.POST or None, instance=todo)
 
-    if request.method == "POST":
-        form = TodoForm(request.POST, instance=todo)
-        if form.is_valid():
-            form.save()
-            return redirect("todos:list")
-    else:
-        form = TodoForm(instance=todo)
+    if form.is_valid():
+        form.save()
+        return redirect("todos:list")
 
     return render(request, "todos/todo_form.html", {"form": form})
 
 
 @login_required
 def todo_complete(request, id):
-    todo = get_object_or_404(Todo, id=id)
+    todo = get_object_or_404(Todo, id=id, user=request.user)
     todo.completed = True
     todo.save()
     return redirect("todos:list")
