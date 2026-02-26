@@ -20,16 +20,13 @@ if env_path.exists():
     DEBUG = env("DEBUG", default=False, cast=bool)
 else:
     SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret-key")
-    DEBUG = False
+    DEBUG = True
 
 # ==============================
 # HOSTS
 # ==============================
 
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS",
-    "127.0.0.1,localhost,inspire-mof5.onrender.com"
-).split(",")
+ALLOWED_HOSTS = ['inspire-mof5.onrender.com', '127.0.0.1']
 
 # ==============================
 # APPS
@@ -120,8 +117,10 @@ USE_TZ = True
 # STATIC FILES (Render)
 # ==============================
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 

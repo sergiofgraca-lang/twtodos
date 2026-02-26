@@ -1,8 +1,12 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponseForbidden
-from .models import Todo
+from django.views.decorators.http import require_POST
 
+from .models import Todo
+from .forms import TodoForm
 
 
 def login_view(request):
@@ -26,7 +30,7 @@ def logout_view(request):
 
 @login_required
 def todo_list(request):
-    todos = Todo.objects.filter(user=request.user).order_by("-created_at")
+    todos = Todo.objects.all().order_by("-created_at")
     return render(request, "todos/todo_list.html", {"todos": todos})
 
 
@@ -51,7 +55,7 @@ def todo_delete(request, id):
         return HttpResponseForbidden("Apenas administradores podem excluir tarefas.")
 
     todo.delete()
-    return redirect("list")
+    return redirect("todos:list")
 
 
 @login_required
