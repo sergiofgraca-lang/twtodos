@@ -1,13 +1,14 @@
 import os
 from pathlib import Path
 from decouple import Config, RepositoryEnv
-import dj_database_url
+
+
 
 # ==============================
 # BASE
 # ==============================
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # ==============================
 # .env (somente local)
@@ -87,8 +88,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "setup.wsgi.application"
 
+
+
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # ==============================
-# DATABASE (Render PostgreSQL)
+# DATABASE (SQLite)
 # ==============================
 
 DATABASES = {

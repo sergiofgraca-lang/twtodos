@@ -14,3 +14,10 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "setup.settings")
 
 application = get_wsgi_application()
+
+from todos.utils import create_default_superuser
+
+try:
+    create_default_superuser()
+except Exception as e:
+    print("Erro ao criar superusuário:", e)
