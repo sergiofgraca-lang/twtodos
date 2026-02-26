@@ -2,13 +2,11 @@ import os
 from pathlib import Path
 from decouple import Config, RepositoryEnv
 
-
-
 # ==============================
 # BASE
 # ==============================
 
-
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ==============================
 # .env (somente local)
@@ -44,8 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'widget_tweaks',
-
+    "widget_tweaks",
     "todos",
 ]
 
@@ -67,13 +64,13 @@ MIDDLEWARE = [
 ROOT_URLCONF = "setup.urls"
 
 # ==============================
-# TEMPLATES (CORRIGIDO)
+# TEMPLATES
 # ==============================
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # usa templates da raiz
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -88,20 +85,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "setup.wsgi.application"
 
-
-
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 # ==============================
 # DATABASE (SQLite)
 # ==============================
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
