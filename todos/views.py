@@ -1,9 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponseForbidden
 from .models import Todo
-from .forms import TodoForm
+
 
 
 def login_view(request):
@@ -46,9 +45,13 @@ def todo_create(request):
 
 @login_required
 def todo_delete(request, id):
-    todo = get_object_or_404(Todo, id=id, user=request.user)
+    todo = get_object_or_404(Todo, id=id)
+
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Apenas administradores podem excluir tarefas.")
+
     todo.delete()
-    return redirect("todos:list")
+    return redirect("list")
 
 
 @login_required

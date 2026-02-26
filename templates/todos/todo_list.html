@@ -94,13 +94,15 @@
                                     </a>
                                 {% endif %}
 
-                                <a href="{% url 'todos:delete' todo.id %}"
-                                   onclick="return confirm('Deseja excluir esta tarefa?')"
-                                   style="padding:6px 12px; background:#e74c3c;
-                                          color:white; text-decoration:none;
-                                          border-radius:4px; white-space:nowrap;">
-                                    Excluir
-                                </a>
+                                {% if user.is_superuser %}
+                                    <a href="{% url 'todos:delete' todo.id %}"
+                                       onclick="return confirm('Deseja excluir esta tarefa?')"
+                                       style="padding:6px 12px; background:#e74c3c;
+                                              color:white; text-decoration:none;
+                                              border-radius:4px; white-space:nowrap;">
+                                        Excluir
+                                    </a>
+                                {% endif %}
 
                             </div>
                         </td>
